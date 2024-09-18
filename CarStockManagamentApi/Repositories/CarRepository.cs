@@ -13,26 +13,8 @@ namespace CarStockManagamentApi.Data
 
         public CarRepository()
         {
-            _dealerCars = new Dictionary<string, List<Car>>
-            {
-                {
-                    "1", new List<Car>
-                    {
-                        new Car { Id = 0, DealerId = "1", Make = "Audi", Model = "A4", Year = 2018, StockQuantity = 1 },
-                        new Car { Id = 1, DealerId = "1", Make = "Audi", Model = "A4", Year = 2017, StockQuantity = 3 },
-                        new Car { Id = 2, DealerId = "1", Make = "Toyota", Model = "Rav4", Year = 2020, StockQuantity = 1 },
-                        new Car { Id = 3, DealerId = "1", Make = "Toyota", Model = "Corolla", Year = 2020, StockQuantity = 4 }
-                    }
-                },
-                {
-                    "2", new List<Car>
-                    {
-                        new Car { Id = 0, DealerId = "2", Make = "Tesla", Model = "Model Y", Year = 2021, StockQuantity = 1 },
-                        new Car { Id = 1, DealerId = "2", Make = "Honda", Model = "CRV", Year = 2019, StockQuantity = 8 },
-                        new Car { Id = 2, DealerId = "2", Make = "Mazda", Model = "CX-9", Year = 2019, StockQuantity = 1 }
-                    }
-                }
-            };
+            var seeder = new CarSeeder();
+            _dealerCars = seeder.SeedCars(ref _carId);
 
             // Ensure the car ID is in sync with the initial seed data
             _carId = _dealerCars.SelectMany(d => d.Value).Max(c => c.Id);

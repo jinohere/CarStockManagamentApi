@@ -17,7 +17,7 @@ namespace CarStockManagementApi.Repositories
         /// </summary>
         /// <param name="dealerId">The unique identifier of the dealer.</param>
         /// <returns>The dealer if found; otherwise, null.</returns>
-        Dealer? GetDealerById(string dealerId);
+        Dealer? GetDealerByID(string dealerId);
 
         /// <summary>
         /// Retrieves a dealer by their name and location.

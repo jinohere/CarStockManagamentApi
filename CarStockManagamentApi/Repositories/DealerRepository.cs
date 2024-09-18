@@ -14,12 +14,8 @@ namespace CarStockManagamentApi.Data
         public DealerRepository()
         {
             // Initialize with default seed data for dealers
-            _dealers = new List<Dealer>
-            {
-                new Dealer { Id = "1", Name = "Melbourne Toyota", Location = "West Melbourne" },
-                new Dealer { Id = "2", Name = "South Morang Mazda", Location = "South Morang" }
-            };
-
+            var seeder = new DealerSeeder();
+            _dealers = seeder.SeedDealers(ref _dealerId);
             // Ensure the dealer ID is in sync with the initial seed data
             _dealerId = _dealers.Max(d => int.Parse(d.Id));
         }
