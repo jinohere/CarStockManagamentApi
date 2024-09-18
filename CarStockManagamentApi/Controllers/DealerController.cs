@@ -8,24 +8,49 @@ namespace CarStockManagementApi.Controllers
         private readonly DealerRepository _dealerRepository;
         private readonly ILogger<DealerController> _logger;
 
-        public DealerController(DealerRepository dealerRepository, ILogger<DealerController> logger)
+        public DealerController(DealerRepository dealerRepository)
         {
             _dealerRepository = dealerRepository;
-            _logger = logger;
+        }
+
+        public IResult GetAllDealers()
+        {
+            var dealers = _dealerRepository.GetAllDealers();
+            if (dealers == null || !dealers.Any())
+            {
+                return Results.NotFound(CreateErrorResponse("No dealers were found in the system. Please add dealers to proceed."));
+            }
+            return Results.Ok(new
+            {
+                Message = "Dealers retrieved successfully.",
+                Dealers = dealers
+            });
         }
 
         public IResult AddDealer(DealerDto dealerDto)
         {
             if (dealerDto == null)
-                return Results.BadRequest("Dealer data must be provided.");
+                return Results.BadRequest(CreateErrorResponse("Dealer data must be provided and cannot be null. Please check your input."));
 
             var existingDealer = _dealerRepository.GetDealerByNameAndLocation(dealerDto.Name, dealerDto.Location);
             if (existingDealer != null)
-                return Results.Conflict(new { Message = "Dealer already exists." });
+                return Results.Conflict(CreateErrorResponse("A dealer with the same name and location already exists. Please use a different name or location."));
 
             var dealer = _dealerRepository.AddDealer(dealerDto);
-            _logger.LogInformation("Dealer added: {DealerName}", dealerDto.Name);
-            return Results.Created($"/dealers/{dealer.Id}", dealer);
+            return Results.Created($"/dealers/{dealer.Id}", new
+            {
+                Message = "Dealer added successfully.",
+                Dealer = dealer
+            });
+        }
+
+        private static object CreateErrorResponse(string message)
+        {
+            return new
+            {
+                Error = "Request Error",
+                Message = message
+            };
         }
     }
 }

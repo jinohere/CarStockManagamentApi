@@ -14,6 +14,34 @@ namespace CarStockManagamentApi.Data
             return _dealerCars.ContainsKey(dealerId) ? _dealerCars[dealerId] : new List<Car>();
         }
 
+        public CarRepository()
+        {
+            // Initialize with default seed data
+            _dealerCars = new Dictionary<string, List<Car>>
+        {
+            {
+                "1", new List<Car> // Dealer with ID "0"
+                {
+                    new Car { Id = 0, Make = "Audi", Model = "A4", Year = 2018, StockQuantity = 1},
+                    new Car { Id = 1, Make = "Audi", Model = "A4", Year = 2017, StockQuantity = 1},
+                    new Car { Id = 2, Make = "Toyota", Model = "Rav4", Year = 2020, StockQuantity = 1},
+                    new Car { Id = 3, Make = "Toyota", Model = "Corolla", Year = 2020, StockQuantity = 1}
+                }
+            },
+            {
+                "2", new List<Car> // Dealer with ID "1"
+                {
+                    new Car { Id = 0, Make = "Tesla", Model = "model Y", Year = 2021, StockQuantity = 1},
+                    new Car { Id = 1, Make = "Honda", Model = "CRV", Year = 2019, StockQuantity = 1},
+                    new Car { Id = 2, Make = "Mazda", Model = "CX9", Year = 2019, StockQuantity = 1},
+                }
+            }
+        };
+
+            // Ensure the car ID is in sync with the initial seed data
+            _carId = _dealerCars.SelectMany(d => d.Value).Max(c => c.Id);
+        }
+
         public Car AddCar(string dealerId, CarDto carDto)
         {
             // Check if the dealer already has a list of cars
