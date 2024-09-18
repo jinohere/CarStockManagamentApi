@@ -1,6 +1,7 @@
 ﻿using CarStockManagamentApi.Data;
 using CarStockManagamentApi.DTO;
 using CarStockManagamentApi.Models;
+using CarStockManagementApi.Validator;
 
 namespace CarStockManagementApi.Controllers
 {
@@ -8,11 +9,13 @@ namespace CarStockManagementApi.Controllers
     {
         private readonly DealerRepository _dealerRepository;
         private readonly CarRepository _carRepository;
+        private readonly CarValidator _carValidator;
 
         public CarController(DealerRepository dealerRepository, CarRepository carRepository)
         {
             _dealerRepository = dealerRepository;
             _carRepository = carRepository;
+            _carValidator = new CarValidator();
         }
 
         /// <summary>
@@ -32,12 +35,12 @@ namespace CarStockManagementApi.Controllers
         /// </returns>
         public IResult AddCar(string dealerId, CarDto carDto)
         {
-            if (carDto == null)
-                return Results.BadRequest(CreateErrorResponse("Car data must be provided. Please include all necessary details to add a car."));
-
-            var dealer = GetDealer(dealerId);
-            if (dealer == null)
-                return Results.NotFound(CreateErrorResponse($"Dealer with ID '{dealerId}' not found. Ensure the dealer ID is correct and try again."));
+            var dealer = _dealerRepository.GetDealerByID(dealerId);
+            var validationResult = _carValidator.ValidateAddCar(dealerId, carDto, dealer);
+            if (validationResult != null)
+            {
+                return validationResult; // Return validation error
+            }
 
             var car = _carRepository.AddCar(dealerId, carDto);
             return Results.Created($"/dealers/{dealerId}/cars/{car.Id}", new
@@ -72,12 +75,12 @@ namespace CarStockManagementApi.Controllers
         /// </returns>
         public IResult SearchCars(string dealerId, string? make, string? model, int? year)
         {
-            var dealer = GetDealer(dealerId);
-            if (dealer == null)
-                return Results.NotFound(CreateErrorResponse($"Dealer with ID '{dealerId}' not found. Verify the dealer ID and try again."));
-
-            if (string.IsNullOrEmpty(make) && string.IsNullOrEmpty(model) && !year.HasValue)
-                return Results.BadRequest(CreateErrorResponse("At least one search parameter (make, model, year) must be provided to search for cars."));
+            var dealer = _dealerRepository.GetDealerByID(dealerId);
+            var validationResult = _carValidator.ValidateSearchCars(dealerId, make, model, year, dealer);
+            if (validationResult != null)
+            {
+                return validationResult; // Return validation error
+            }
 
             var cars = _carRepository.SearchCars(dealerId, make, model, year);
             if (cars == null || !cars.Any())
@@ -112,13 +115,17 @@ namespace CarStockManagementApi.Controllers
         /// </returns>
         public IResult RemoveCar(string dealerId, string make, string model, int year)
         {
-            var dealer = GetDealer(dealerId);
-            if (dealer == null)
-                return Results.NotFound(CreateErrorResponse($"Dealer with ID '{dealerId}' not found. Please check the dealer ID and try again."));
+            var dealer = _dealerRepository.GetDealerByID(dealerId);
+            var car = _carRepository.GetCarByMakeModelYear(dealerId, make, model, year);
+            // Validate the dealer and car
+            var validationResult = _carValidator.ValidateRemoveCar(dealerId, car, dealer);
+            if (validationResult != null)
+            {
+                return validationResult; // Return validation error
+            }
 
-            var result = _carRepository.RemoveCar(dealerId, make, model, year);
-            if (result == null)
-                return Results.NotFound(CreateErrorResponse($"Car {make} {model} ({year}) not found in dealer's inventory."));
+            var result = _carRepository.RemoveCar(dealerId, car);
+            
 
             return Results.Ok(new
             {
@@ -153,27 +160,24 @@ namespace CarStockManagementApi.Controllers
         /// </returns>
         public IResult UpdateCarStock(string dealerId, string make, string model, int year, int stockQuantity)
         {
-            var dealer = GetDealer(dealerId);
-            if (dealer == null)
-                return Results.NotFound(CreateErrorResponse($"Dealer with ID '{dealerId}' not found. Please check the dealer ID and try again."));
-
-            if (stockQuantity < 0)
-                return Results.BadRequest(CreateErrorResponse("Stock quantity must be a non-negative number. Please provide a valid stock quantity."));
-
-            var car = _carRepository.UpdateCarStock(dealerId, make, model, year, stockQuantity);
+            var dealer = _dealerRepository.GetDealerByID(dealerId);
+ 
+            var car = _carRepository.GetCarByMakeModelYear(dealerId, make, model, year);
+            // Validate the dealer, car, and stock quantity
+            var validationResult = _carValidator.ValidateUpdateCarStock(dealerId, car, dealer, stockQuantity);
+            if (validationResult != null)
+            {
+                return validationResult; // Return validation error
+            }
             if (car == null)
                 return Results.NotFound(CreateErrorResponse($"Car {make} {model} ({year}) not found in dealer's inventory."));
+            var updatedStock = _carRepository.UpdateCarStock(dealerId, car, stockQuantity);
 
             return Results.Ok(new
             {
                 Message = "Car stock updated successfully.",
-                Car = car
+                Car = updatedStock
             });
-        }
-
-        private Dealer? GetDealer(string dealerId)
-        {
-            return _dealerRepository.GetDealerByID(dealerId);
         }
 
         private static object CreateErrorResponse(string message)

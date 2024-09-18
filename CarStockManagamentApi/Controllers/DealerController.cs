@@ -6,7 +6,6 @@ namespace CarStockManagementApi.Controllers
     public class DealerController
     {
         private readonly DealerRepository _dealerRepository;
-        private readonly ILogger<DealerController> _logger;
 
         public DealerController(DealerRepository dealerRepository)
         {
@@ -14,11 +13,11 @@ namespace CarStockManagementApi.Controllers
         }
 
         /// <summary>
-/// Retrieves all dealers from the repository.
-/// </summary>
-/// <returns>
-/// A list of dealers if found, or a 404 Not Found response if no dealers exist in the system.
-/// </returns>
+        /// Retrieves all dealers from the repository.
+        /// </summary>
+        /// <returns>
+        /// A list of dealers if found, or a 404 Not Found response if no dealers exist in the system.
+        /// </returns>
         public IResult GetAllDealers()
         {
             var dealers = _dealerRepository.GetAllDealers();
@@ -33,6 +32,17 @@ namespace CarStockManagementApi.Controllers
             });
         }
 
+        /// <summary>
+        /// Adds a new dealer to the repository.
+        /// </summary>
+        /// <param name="dealerDto">The DTO object containing the details of the dealer to be added. This must not be null.</param>
+        /// <returns>
+        /// A 201 Created response containing the details of the newly added dealer if successful,
+        /// or an error response if validation fails.
+        /// 
+        /// - Returns 400 Bad Request if the dealer data is null.
+        /// - Returns 409 Conflict if a dealer with the same name and location already exists.
+        /// </returns>
         public IResult AddDealer(DealerDto dealerDto)
         {
             if (dealerDto == null)
