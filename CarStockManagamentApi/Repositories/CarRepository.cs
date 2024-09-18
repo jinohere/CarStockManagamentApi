@@ -71,7 +71,7 @@ namespace CarStockManagamentApi.Data
         }
 
 
-        public List<Car> RemoveCar(string dealerId, string make, string model, int year)
+        public List<Car>? RemoveCar(string dealerId, string make, string model, int year)
         {
             if (_dealerCars.ContainsKey(dealerId))
             {

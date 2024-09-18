@@ -15,6 +15,21 @@ namespace CarStockManagementApi.Controllers
             _carRepository = carRepository;
         }
 
+        /// <summary>
+        /// Adds a new car to the specified dealer's inventory.
+        /// </summary>
+        /// <param name="dealerId">
+        /// The ID of the dealer to which the car will be added. This must be a valid, existing dealer ID.
+        /// </param>
+        /// <param name="carDto">
+        /// A DTO object containing the details of the car (e.g., Make, Model, Year). This must not be null.
+        /// </param>
+        /// <returns>
+        /// A 201 Created response containing the newly added car's details if successful, or an error response if validation fails.
+        /// 
+        /// - Returns 400 Bad Request if the car data is null.
+        /// - Returns 404 Not Found if the dealer is not found.
+        /// </returns>
         public IResult AddCar(string dealerId, CarDto carDto)
         {
             if (carDto == null)
@@ -32,6 +47,26 @@ namespace CarStockManagementApi.Controllers
             });
         }
 
+        /// <summary>
+        /// Removes a car from the specified dealer's inventory based on the make, model, and year of the car.
+        /// </summary>
+        /// <param name="dealerId">
+        /// The ID of the dealer from which the car will be removed. Must be a valid, existing dealer ID.
+        /// </param>
+        /// <param name="make">
+        /// The make (brand) of the car to be removed (e.g., "Toyota").
+        /// </param>
+        /// <param name="model">
+        /// The model of the car to be removed (e.g., "Corolla").
+        /// </param>
+        /// <param name="year">
+        /// The year of manufacture of the car to be removed.
+        /// </param>
+        /// <returns>
+        /// A 200 OK response with the details of the removed car, or an error response if validation fails.
+        /// 
+        /// - Returns 404 Not Found if the dealer or car is not found.
+        /// </returns>
         public IResult RemoveCar(string dealerId, string make, string model, int year)
         {
             var dealer = GetDealer(dealerId);
@@ -49,6 +84,28 @@ namespace CarStockManagementApi.Controllers
             });
         }
 
+        /// <summary>
+        /// Searches for cars in a dealer's inventory based on optional criteria: make, model, and year.
+        /// At least one search parameter must be provided.
+        /// </summary>
+        /// <param name="dealerId">
+        /// The ID of the dealer to search within. Must be a valid, existing dealer ID.
+        /// </param>
+        /// <param name="make">
+        /// Optional. The make (brand) of the car (e.g., "Toyota"). If null or empty, this criterion will be ignored.
+        /// </param>
+        /// <param name="model">
+        /// Optional. The model of the car (e.g., "Corolla"). If null or empty, this criterion will be ignored.
+        /// </param>
+        /// <param name="year">
+        /// Optional. The year of manufacture of the car. If null, this criterion will be ignored.
+        /// </param>
+        /// <returns>
+        /// A 200 OK response with a list of cars that match the search criteria, or an error response if validation fails.
+        /// 
+        /// - Returns 400 Bad Request if no search criteria are provided.
+        /// - Returns 404 Not Found if the dealer or no cars match the search criteria.
+        /// </returns>
         public IResult SearchCars(string dealerId, string? make, string? model, int? year)
         {
             var dealer = GetDealer(dealerId);
@@ -69,6 +126,30 @@ namespace CarStockManagementApi.Controllers
             });
         }
 
+        /// <summary>
+        /// Updates the stock quantity of a specified car in a dealer's inventory.
+        /// Ensures the stock quantity is non-negative before updating.
+        /// </summary>
+        /// <param name="dealerId">
+        /// The unique identifier of the dealer. Must be a valid dealer ID.
+        /// </param>
+        /// <param name="make">
+        /// The make (brand) of the car (e.g., "Toyota"). This is a required field.
+        /// </param>
+        /// <param name="model">
+        /// The model of the car (e.g., "Corolla"). This is a required field.
+        /// </param>
+        /// <param name="year">
+        /// The year of manufacture of the car. This is a required field and should be valid for the car model.
+        /// </param>
+        /// <param name="stockQuantity">
+        /// The updated stock quantity for the car. It must be a non-negative integer.
+        /// </param>
+        /// <returns>
+        /// - Returns 200 OK with the updated car information if successful.
+        /// - Returns 400 Bad Request if the stock quantity is invalid (negative).
+        /// - Returns 404 Not Found if the dealer or car is not found.
+        /// </returns>
         public IResult UpdateCarStock(string dealerId, string make, string model, int year, int stockQuantity)
         {
             var dealer = GetDealer(dealerId);
