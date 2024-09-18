@@ -106,10 +106,14 @@ namespace CarStockManagamentApi.Data
                 return new List<Car>();
             }
 
-            // Filter cars based on the search criteria
+            // Convert make and model to lowercase for case-insensitive comparison
+            var lowerMake = make?.ToLower();
+            var lowerModel = model?.ToLower();
+
+            // Filter cars based on the search criteria with case-insensitive make and model comparison
             var filteredCars = _dealerCars[dealerId]
-                .Where(c => (make == null || c.Make.Equals(make, StringComparison.OrdinalIgnoreCase)) &&
-                             (model == null || c.Model.Equals(model, StringComparison.OrdinalIgnoreCase)) &&
+                .Where(c => (string.IsNullOrEmpty(lowerMake) || c.Make.ToLower() == lowerMake) &&
+                             (string.IsNullOrEmpty(lowerModel) || c.Model.ToLower() == lowerModel) &&
                              (!year.HasValue || c.Year == year.Value))
                 .ToList();
 
@@ -128,7 +132,6 @@ namespace CarStockManagamentApi.Data
 
             return uniqueCars;
         }
-
 
         public Car? UpdateCarStock(string dealerId, string make, string model, int year, int newStock)
         {

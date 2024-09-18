@@ -47,42 +47,6 @@ namespace CarStockManagementApi.Controllers
             });
         }
 
-        /// <summary>
-        /// Removes a car from the specified dealer's inventory based on the make, model, and year of the car.
-        /// </summary>
-        /// <param name="dealerId">
-        /// The ID of the dealer from which the car will be removed. Must be a valid, existing dealer ID.
-        /// </param>
-        /// <param name="make">
-        /// The make (brand) of the car to be removed (e.g., "Toyota").
-        /// </param>
-        /// <param name="model">
-        /// The model of the car to be removed (e.g., "Corolla").
-        /// </param>
-        /// <param name="year">
-        /// The year of manufacture of the car to be removed.
-        /// </param>
-        /// <returns>
-        /// A 200 OK response with the details of the removed car, or an error response if validation fails.
-        /// 
-        /// - Returns 404 Not Found if the dealer or car is not found.
-        /// </returns>
-        public IResult RemoveCar(string dealerId, string make, string model, int year)
-        {
-            var dealer = GetDealer(dealerId);
-            if (dealer == null)
-                return Results.NotFound(CreateErrorResponse($"Dealer with ID '{dealerId}' not found. Please check the dealer ID and try again."));
-
-            var result = _carRepository.RemoveCar(dealerId, make, model, year);
-            if (result == null)
-                return Results.NotFound(CreateErrorResponse($"Car {make} {model} ({year}) not found in dealer's inventory."));
-
-            return Results.Ok(new
-            {
-                Message = "Car successfully removed from dealer's inventory.",
-                RemovedCar = result
-            });
-        }
 
         /// <summary>
         /// Searches for cars in a dealer's inventory based on optional criteria: make, model, and year.
@@ -123,6 +87,43 @@ namespace CarStockManagementApi.Controllers
             {
                 Message = "Search results retrieved successfully.",
                 Cars = cars
+            });
+        }
+
+        /// <summary>
+        /// Removes a car from the specified dealer's inventory based on the make, model, and year of the car.
+        /// </summary>
+        /// <param name="dealerId">
+        /// The ID of the dealer from which the car will be removed. Must be a valid, existing dealer ID.
+        /// </param>
+        /// <param name="make">
+        /// The make (brand) of the car to be removed (e.g., "Toyota").
+        /// </param>
+        /// <param name="model">
+        /// The model of the car to be removed (e.g., "Corolla").
+        /// </param>
+        /// <param name="year">
+        /// The year of manufacture of the car to be removed.
+        /// </param>
+        /// <returns>
+        /// A 200 OK response with the details of the removed car, or an error response if validation fails.
+        /// 
+        /// - Returns 404 Not Found if the dealer or car is not found.
+        /// </returns>
+        public IResult RemoveCar(string dealerId, string make, string model, int year)
+        {
+            var dealer = GetDealer(dealerId);
+            if (dealer == null)
+                return Results.NotFound(CreateErrorResponse($"Dealer with ID '{dealerId}' not found. Please check the dealer ID and try again."));
+
+            var result = _carRepository.RemoveCar(dealerId, make, model, year);
+            if (result == null)
+                return Results.NotFound(CreateErrorResponse($"Car {make} {model} ({year}) not found in dealer's inventory."));
+
+            return Results.Ok(new
+            {
+                Message = "Car successfully removed from dealer's inventory.",
+                StockAfterRemoveCar = result
             });
         }
 

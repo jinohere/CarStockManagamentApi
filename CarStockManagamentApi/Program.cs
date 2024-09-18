@@ -32,8 +32,8 @@ var carController = new CarController(app.Services.GetRequiredService<DealerRepo
 app.MapGet("/dealers", () => dealerController.GetAllDealers());
 app.MapPost("/dealers", (DealerDto dealerDto) => dealerController.AddDealer(dealerDto));
 app.MapPost("{dealerId}/cars", (string dealerId, CarDto carDto) => carController.AddCar(dealerId, carDto));
-app.MapDelete("{dealerId}/cars", (string dealerId, string make, string model, int year) => carController.RemoveCar(dealerId, make, model, year));
 app.MapGet("{dealerId}/cars", (string dealerId, string? make, string? model, int? year) => carController.SearchCars(dealerId, make, model, year));
+app.MapDelete("{dealerId}/cars", (string dealerId, string make, string model, int year) => carController.RemoveCar(dealerId, make, model, year));
 app.MapPut("{dealerId}/stocks", (string dealerId, string make, string model, int year, int stockQuantity) => carController.UpdateCarStock(dealerId, make, model, year, stockQuantity));
 
 
