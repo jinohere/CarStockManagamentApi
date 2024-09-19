@@ -11,7 +11,7 @@ Remove Cars: Remove cars from a dealer's inventory.
 Update Stock: Update the stock quantity of existing cars.
 In-Memory Database: Utilize an in-memory database for rapid testing and development.
 Swagger UI: Explore and test the API using Swagger.
-Getting Started
+
 Dependencies
 .NET SDK 8.0
 Docker (optional, for containerization)
