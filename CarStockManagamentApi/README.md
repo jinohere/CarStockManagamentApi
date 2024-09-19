@@ -18,25 +18,33 @@ Docker (optional, for containerization)
 Cloning the Repository
 To clone the repository, use the following command:
 
+Getting Started
+Clone the Repository
+To get started, clone the repository to your local machine:
+
 bash
 Copy code
 git clone https://github.com/jinohere/CarStockManagamentApi.git
 cd CarStockManagamentApi
 Building the Project
-Before running the application, build the project with the following command:
+Before running the application, you need to build the project. Open your terminal and execute:
 
 bash
 Copy code
 dotnet build
 Running the Application
-To run the application locally, use:
+Instead of using the command line to run the application, you can directly open the project in Visual Studio. Follow these steps:
+
+Open Visual Studio.
+Click on "Open a project or solution" and navigate to the cloned CarStockManagamentApi directory.
+Select the .csproj file and click "Open".
+Once the project is loaded, build the solution by clicking on Build > Build Solution.
+Run the project by clicking the Start button (or press F5).
+Accessing the API
+Once the application is running, you can access the API documentation and testing interface via Swagger at:
 
 bash
 Copy code
-dotnet run --project CarStockManagamentApi
-Accessing the API
-Once the application is running, access the API documentation and testing interface via Swagger at:
-
 http://localhost:5077/swagger/index.html
 
 Author
